@@ -1,5 +1,5 @@
 site_name: Anti-gravity Doc System
-site_url: https://joy.github.io/mydoc/
+site_url: https://krjoylee.github.io/mydoc/
 site_description: Anti-gravity 문서 중심 시스템 — 원본 동기화 & Steve 마킹 보존
 site_author: Steve (Joy)
 
@@ -54,7 +54,7 @@ markdown_extensions:
       custom_fences:
         - name: mermaid
           class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.inlinehilite
@@ -85,7 +85,7 @@ nav:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/joy/mydoc
+      link: https://github.com/krjoylee/mydoc
 
 extra_css:
   - assets/stylesheets/custom.css
