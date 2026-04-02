@@ -1,0 +1,5 @@
+mkdocs-material
+mkdocs-minify-plugin
+requests
+beautifulsoup4
+markdownify

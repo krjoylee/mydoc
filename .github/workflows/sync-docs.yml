@@ -1,0 +1,63 @@
+name: Sync Antigravity Docs
+
+on:
+  schedule:
+    # 매월 1일 오전 3시(UTC) 자동 실행
+    - cron: '0 3 1 * *'
+  workflow_dispatch:
+    inputs:
+      force_sync:
+        description: '강제 동기화 여부 (Force sync)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install requests beautifulsoup4 markdownify
+
+      - name: Run sync script
+        run: python scripts/sync_docs.py
+        env:
+          FORCE_SYNC: ${{ github.event.inputs.force_sync }}
+
+      - name: Run merge markings
+        run: python scripts/merge_markings.py
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add -A
+          git commit -m "docs: 원본 문서 동기화 (auto-sync $(date +%Y-%m-%d))"
+          git push

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Security Gate -->
+<div id="security-gate">
+  <div class="gate-container">
+    <div class="gate-icon">🔒</div>
+    <h2>Anti-gravity Doc System</h2>
+    <p style="color: #8b949e; margin-bottom: 1.5rem;">접근 권한이 필요합니다 (Access Required)</p>
+    <input type="password" id="gate-password" placeholder="비밀번호 입력..." 
+           onkeypress="if(event.key==='Enter')checkPassword()">
+    <button onclick="checkPassword()">확인 (Enter)</button>
+    <div class="error-msg" id="gate-error"></div>
+  </div>
+</div>
+
+<!-- Actual Content (hidden until auth) -->
+<div id="main-content" style="display:none;">
+  {{ super() }}
+</div>
+
+<script>
+  // Simple client-side password gate
+  // 기본 비밀번호: "antigravity" (추후 변경 가능)
+  const PASS_HASH = "5a2d5c7e"; // Simple hash of "antigravity"
+  
+  function simpleHash(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash |= 0;
+    }
+    return (hash >>> 0).toString(16).slice(0, 8);
+  }
+  
+  function checkPassword() {
+    const input = document.getElementById('gate-password').value;
+    const hashed = simpleHash(input);
+    
+    if (hashed === PASS_HASH) {
+      // Store auth in sessionStorage
+      sessionStorage.setItem('ag-auth', 'true');
+      unlockContent();
+    } else {
+      document.getElementById('gate-error').textContent = '비밀번호가 틀렸습니다 (Incorrect password)';
+      document.getElementById('gate-password').value = '';
+      document.getElementById('gate-password').focus();
+    }
+  }
+  
+  function unlockContent() {
+    const gate = document.getElementById('security-gate');
+    const content = document.getElementById('main-content');
+    gate.classList.add('hidden');
+    content.style.display = 'block';
+    setTimeout(() => gate.remove(), 600);
+  }
+  
+  // Check if already authenticated
+  if (sessionStorage.getItem('ag-auth') === 'true') {
+    document.getElementById('security-gate').remove();
+    document.getElementById('main-content').style.display = 'block';
+  }
+</script>
+{% endblock %}
